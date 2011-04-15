@@ -5,18 +5,19 @@ QGradualBox::QGradualBox()
 {
     setAttribute(Qt::WA_TranslucentBackground,true);
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
-    mX = 100;
-    mY = 500;
-    mWidth = 200;
-    mHeight = 30;
+    //mX = 100;
+    //mY = 500;
+    //mWidth = 200;
+    //mHeight = 30;
     mDelay = 50;
-    mOpacity = 0;
+    mOpacity = 0.7;
+    mtOpacity = 0;
     mStatus = 0;
     mBgColor = Qt::black;
     mFontColor = Qt::white;
     mBorderColor = Qt::transparent;
-    mFont = this->font();
-    mTimerRunning = 0;
+    //mFont = this->font();
+    mTimerRunning = -1;
 }
 
 QGradualBox::QGradualBox(const QString & pMessage)
@@ -24,18 +25,19 @@ QGradualBox::QGradualBox(const QString & pMessage)
 {
     setAttribute(Qt::WA_TranslucentBackground,true);
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
-    mX = 100;
-    mY = 500;
-    mWidth = 200;
-    mHeight = 30;
+    //mX = 100;
+    //mY = 500;
+    //mWidth = 200;
+    //mHeight = 30;
     mDelay = 50;
-    mOpacity = 0;
+    mOpacity = 0.7;
+    mtOpacity = 0;
     mStatus = 0;
     mBgColor = Qt::black;
     mFontColor = Qt::white;
     mBorderColor = Qt::transparent;
-    mFont = this->font();
-    setGeometry ( mX, mY, mWidth, mHeight );
+    //mFont = this->font();
+    //setGeometry ( mX, mY, mWidth, mHeight );
     mTimerRunning = -1;
     showText(pMessage);
 }
@@ -53,13 +55,13 @@ void QGradualBox::paintEvent ( QPaintEvent * /*event*/ )
     pen.setWidth(5);
     painter.setRenderHint(QPainter::Antialiasing,true);
     painter.setFont(this->font());
-    painter.setOpacity(mOpacity);
+    painter.setOpacity(mtOpacity);
     painter.setPen(pen);
     painter.setBrush(brush);
-    painter.setOpacity(mOpacity);
+    painter.setOpacity(mtOpacity);
 
     painter.drawRoundedRect(rect(),20.0, 15.0);
-    painter.setOpacity(mOpacity+0.3);
+    painter.setOpacity(mtOpacity+0.3);
     pen.setColor(mFontColor);
     painter.setPen(pen);
     painter.drawText(rect(),mMessage,QTextOption(Qt::AlignHCenter|Qt::AlignVCenter));
@@ -71,7 +73,7 @@ void QGradualBox::showText(const QString & pMessage)
     //
 
     mMsgQueue.enqueue(pMessage);
-    this->show();
+    this->setVisible(true);
     if(mStatus==0&&mTimerRunning==-1)produceMessage();
 }
 
@@ -84,15 +86,13 @@ void QGradualBox::produceMessage()
         mMessage = mMsgQueue.dequeue();
         //qDebug()<<"Ok, I delete one message from the queue";
 
-        QFontMetrics fm(mFont);
-        int pixelsWide = fm.width(mMessage);//Get the width of the text you want to show
-        int pixelsHigh = fm.height();
-        mWidth = pixelsWide+30;
-        mHeight = pixelsHigh+50;
+        QFontMetrics fm(this->font());
+        int mWidth = fm.width(mMessage)+30;//Get the width of the text you want to show
+        int mHeight = fm.height()+50;
         resize ( mWidth, mHeight);
 
-        mX = (QApplication::desktop()->screenGeometry().center() - QPoint(pixelsWide/2,0)).x();
-        mY = (QApplication::desktop()->screenGeometry().center() - QPoint(pixelsWide/2,0)).y();
+        int mX = (QApplication::desktop()->screenGeometry().center() - QPoint((mWidth-50)/2,0)).x();
+        int mY = (QApplication::desktop()->screenGeometry().center() - QPoint((mHeight-30)/2,0)).y();
         move(mX,mY*1.5);
         //update();
         mTimerRunning = startTimer(85);
@@ -107,9 +107,9 @@ void QGradualBox::timerEvent(QTimerEvent *  event)
     //qDebug() <<"TimerId:"<<event->timerId();
     if(mStatus < 2)
     {
-        mOpacity+=0.1;
+        mtOpacity+=0.1;
         update();
-        if(mOpacity>=0.7)
+        if(mtOpacity>=mOpacity)
         {
             mStatus =2;
             return;
@@ -131,12 +131,12 @@ void QGradualBox::timerEvent(QTimerEvent *  event)
     }
     else if(mStatus == 3)
     {
-        mOpacity-=0.1;
+        mtOpacity-=0.1;
         //qDebug()<<"mOpacity:"<<mOpacity;
         update();
-        if(mOpacity<=0.0)
+        if(mtOpacity<=-0.3)
         {
-            mOpacity = 0;
+            mtOpacity = -0.3;
             update();
             //qDebug()<<"mStatus = 3 and turning to 4";
             mStatus = 4;
@@ -146,7 +146,7 @@ void QGradualBox::timerEvent(QTimerEvent *  event)
     else if(mStatus == 4)
     {
         killTimer(mTimerRunning);
-        //qDebug()<<"mOpacity:"<<mOpacity;
+        //qDebug()<<"mtOpacity:"<<mtOpacity;
         mStatus = 0;
         mTimerRunning = -1;
         if(mStatus==0&&mTimerRunning==-1)produceMessage();
