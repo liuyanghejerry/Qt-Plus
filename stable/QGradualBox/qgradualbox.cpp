@@ -84,6 +84,10 @@ void QGradualBox::produceMessage()
     if(mMsgQueue.count())
     {
         mMessage = mMsgQueue.dequeue();
+        //mDelay = mtDelay;
+        //mFontColor = mtFontColor;
+        //mBgColor = mtBgColor;
+        //mBorderColor = mtBorderColor;
         //qDebug()<<"Ok, I delete one message from the queue";
 
         QFontMetrics fm(this->font());
@@ -149,6 +153,7 @@ void QGradualBox::timerEvent(QTimerEvent *  event)
         //qDebug()<<"mtOpacity:"<<mtOpacity;
         mStatus = 0;
         mTimerRunning = -1;
+        emit textShown();
         if(mStatus==0&&mTimerRunning==-1)produceMessage();
         return;
     }

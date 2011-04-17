@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QQueue>
-//#include <QDebug>
+#include <QDebug>
 
 class QGradualBox : public QWidget
 {
@@ -17,6 +17,10 @@ public:
     QGradualBox(const QString & pMessage);
     ~QGradualBox();
 
+signals:
+    void textShown();
+
+public slots:
     void showText(const QString & pMessage);
 
     void setFontColor(QColor pColor){mFontColor=pColor;}
@@ -27,7 +31,6 @@ public:
 
 protected:
     virtual void paintEvent ( QPaintEvent * event );
-    //virtual void showEvent ( QShowEvent * event );
     virtual void timerEvent(QTimerEvent *event);
 
 private:
@@ -43,11 +46,16 @@ private:
     mutable QQueue<QString> mMsgQueue;
     mutable QString mMessage;
     //QFont mFont;
+
     QColor mBgColor;
+    //QColor mtBgColor;
     QColor mFontColor;
+    //QColor mtFontColor;
     QColor mBorderColor;
+    //QColor mtBorderColor;
     //QTimer *mTimer; //replaced by QObject::startTime(int)
     int mDelay;//per 85 ms
+    //int mtDelay;
     mutable int mTimerRunning;//-1 for none.
     mutable int mStatus;//0 for not shown;1 for fade in; 2 for showing; 3 for fade out; 4 for done;
 };
