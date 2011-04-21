@@ -1,7 +1,7 @@
 #include "qgradualbox.h"
 
-QGradualBox::QGradualBox()
-    : QWidget(0)
+QGradualBox::QGradualBox(QWidget * parent)
+    : QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground,true);
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
@@ -10,6 +10,7 @@ QGradualBox::QGradualBox()
     //mWidth = 200;
     //mHeight = 30;
     mDelay = 50;
+    mSpeed = 85;
     mOpacity = 0.7;
     mtOpacity = 0;
     mStatus = 0;
@@ -20,8 +21,8 @@ QGradualBox::QGradualBox()
     mTimerRunning = -1;
 }
 
-QGradualBox::QGradualBox(const QString & pMessage)
-    : QWidget(0)
+QGradualBox::QGradualBox(const QString & pMessage,QWidget * parent)
+    : QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground,true);
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
@@ -73,7 +74,7 @@ void QGradualBox::showText(const QString & pMessage)
     //
 
     mMsgQueue.enqueue(pMessage);
-    this->setVisible(true);
+
     if(mStatus==0&&mTimerRunning==-1)produceMessage();
 }
 
@@ -99,10 +100,12 @@ void QGradualBox::produceMessage()
         int mY = (QApplication::desktop()->screenGeometry().center() - QPoint((mHeight-30)/2,0)).y();
         move(mX,mY*1.5);
         //update();
-        mTimerRunning = startTimer(85);
+        mTimerRunning = startTimer(mSpeed);
+        this->setVisible(true);
         //qDebug() <<"Produce Onece, and the lenth of the queue is "<<mMsgQueue.count();
         //mTimerRunning++;
     }
+    else this->setVisible(false);
 }
 
 void QGradualBox::timerEvent(QTimerEvent *  event)
@@ -152,9 +155,10 @@ void QGradualBox::timerEvent(QTimerEvent *  event)
         killTimer(mTimerRunning);
         //qDebug()<<"mtOpacity:"<<mtOpacity;
         mStatus = 0;
-        mTimerRunning = -1;
+        mTimerRunning = -1;  
         emit textShown();
         if(mStatus==0&&mTimerRunning==-1)produceMessage();
+        //this->setVisible(false);
         return;
     }
 
