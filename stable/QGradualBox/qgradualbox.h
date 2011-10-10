@@ -13,8 +13,8 @@ class QGradualBox : public QWidget
     Q_OBJECT
 
 public:
-    QGradualBox(QWidget * parent=0);
-    QGradualBox(const QString & pMessage,QWidget * parent=0);
+    QGradualBox(QWidget *p = 0);
+    QGradualBox(const QString & pMessage,QWidget *p = 0);
     ~QGradualBox();
 
 signals:
@@ -28,7 +28,7 @@ public slots:
     void setBorderColor(QColor pColor){mBorderColor=pColor;}
     void setMaxOpacity(qreal tOpacity){mOpacity=tOpacity;}
     void setDelay(int pDelay){mDelay=pDelay;}
-    void setSpeed(int pSpeed){mSpeed=pSpeed;}
+    void setAutoDelete(bool pDelete = true){mAutoDelete = pDelete;}
 
 protected:
     virtual void paintEvent ( QPaintEvent * event );
@@ -38,26 +38,16 @@ private:
     void produceMessage();
 
 private:
-    //int mX;
-    //int mY;
-    //int mWidth;
-    //int mHeight;
     qreal mOpacity;//default 0.7
     qreal mtOpacity;//temprorary use
     mutable QQueue<QString> mMsgQueue;
     mutable QString mMessage;
-    //QFont mFont;
 
     QColor mBgColor;
-    //QColor mtBgColor;
     QColor mFontColor;
-    //QColor mtFontColor;
     QColor mBorderColor;
-    //QColor mtBorderColor;
-    //QTimer *mTimer; //replaced by QObject::startTime(int)
-    int mSpeed;//ms
-    int mDelay;//Delay time = mSpeed*mDelay (ms)
-    //int mtDelay;
+    int mDelay;//per 85 ms
+    bool mAutoDelete;
     mutable int mTimerRunning;//-1 for none.
     mutable int mStatus;//0 for not shown;1 for fade in; 2 for showing; 3 for fade out; 4 for done;
 };
