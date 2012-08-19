@@ -140,7 +140,7 @@ void ColorWheel::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     painter.drawImage(0,0,wheel);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 }
@@ -150,9 +150,15 @@ void ColorWheel::drawWheel(const QSize &newSize)
 
     int r = qMin(newSize.width(), newSize.height());
 
+    QStyleOption option;
+    option.initFrom(this);
+//    QStyle::State state = option.state;
+
+    QBrush background = option.palette.window();
+
     QPainter painter(&wheel);
     painter.setRenderHint(QPainter::Antialiasing);
-    wheel.fill(Qt::white);
+    wheel.fill(background.color());
 
     QConicalGradient conicalGradient(0, 0, 0);
     conicalGradient.setColorAt(0.0, Qt::red);
@@ -171,7 +177,7 @@ void ColorWheel::drawWheel(const QSize &newSize)
     painter.setBrush(brush);
     painter.drawEllipse(QPoint(0,0),r/2-margin,r/2-margin);
     /* inner circle */
-    painter.setBrush(Qt::white);
+    painter.setBrush(background);
     painter.drawEllipse(QPoint(0,0),r/2-margin-wheelWidth,r/2-margin-wheelWidth);
 
     //    QPainter painter2(&wheel);
