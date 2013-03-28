@@ -2,11 +2,6 @@
 #define COLORWHEEL_H
 
 #include <QWidget>
-#include <QPainter>
-#include <QResizeEvent>
-#include <QStyleOption>
-#include <QDebug>
-#include <QtCore/qmath.h>
 
 class ColorWheel : public QWidget
 {
@@ -17,23 +12,24 @@ public:
     virtual QSize sizeHint () const;
     virtual QSize minimumSizeHint () const;
     QColor color();
-    void setColor(const QColor &color);
     
 signals:
-    QColor colorChange(const QColor &color);
+    void colorChange(const QColor &color);
     
 public slots:
-    void hueChanged(const int &hue);
-    void svChanged(const QColor &newcolor);
+    void setColor(const QColor &color);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *);
     void resizeEvent(QResizeEvent *event);
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *);
 private:
     QSize initSize;
-    QImage wheel;
+    QImage wheelImage;
+    QImage squareImage;
+    QPixmap wheel;
     bool mouseDown;
     QPoint lastPos;
     int margin;
@@ -44,10 +40,14 @@ private:
     bool inWheel;
     bool inSquare;
     QColor posColor(const QPoint &point);
-    void drawWheel(const QSize &newSize);
+    void drawWheelImage(const QSize &newSize);
     void drawIndicator(const int &hue);
     void drawPicker(const QColor &color);
-    void drawSquare(const int &hue);
+    void drawSquareImage(const int &hue);
+    void composeWheel();
+private slots:
+    void hueChanged(const int &hue);
+    void svChanged(const QColor &newcolor);
 };
 
 #endif // COLORWHEEL_H
